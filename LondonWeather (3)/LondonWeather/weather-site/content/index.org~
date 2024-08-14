@@ -1,0 +1,379 @@
+#+options: ':nil *:t -:t ::t <:t H:3 \n:nil ^:t arch:headline
+#+options: author:t broken-links:nil c:nil creator:nil
+#+options: d:(not "LOGBOOK") date:t e:t email:nil expand-links:t f:t
+#+options: inline:t num:t p:nil pri:nil prop:nil stat:t tags:t
+#+options: tasks:t tex:t timestamp:t title:t toc:t todo:t |:t
+#+title: Proyecto ICCD332 Arquitectura de Computadores
+#+date: 2024-08-07
+#+author: Boris Garcés, Hodalys López
+#+email: boris.garces@epn.edu.ec, hodalys.lopez@epn.edu.ec
+#+language: es
+#+select_tags: export
+#+exclude_tags: noexport
+#+creator: Emacs 27.1 (Org mode 9.7.5)
+#+cite_export:
+* City Weather APP
+Este es el proyecto de fin de semestre en donde se pretende demostrar
+las destrezas obtenidas durante el transcurso de la asignatura de
+**Arquitectura de Computadores**.
+
+1. Conocimientos de sistema operativo Linux
+2. Conocimientos de Emacs/Jupyter
+3. Configuración de Entorno para Data Science con Mamba/Anaconda
+4. Literate Programming
+ 
+** Estructura del proyecto
+Se recomienda que el proyecto se cree en el /home/ del sistema
+operativo i.e. /home/<user>/. Allí se creará la carpeta /CityWeather/
+#+begin_src shell :results output :exports both
+  #cd ..
+  #cd ..
+  pwd
+#+end_src
+
+#+RESULTS:
+: /home/hodalys/LondonWeather/weather-site/content
+
+El proyecto ha de tener los siguientes archivos y
+subdirectorios. Adaptar los nombres de los archivos según las ciudades
+específicas del grupo.
+
+#+begin_src shell :results output :exports results
+cd ..
+cd ..
+tree
+#+end_src
+
+#+RESULTS:
+#+begin_example
+.
+├── CityTemperatureAnalysis.ipynb
+├── clima-london-hoy-etl.csv
+├── clima-london-hoy.csv
+├── get-weather.sh
+├── main.py
+├── main.py~
+├── output.log
+├── temperature.png
+└── weather-site
+    ├── build-site.el
+    ├── build.sh
+    ├── content
+    │   ├── #index.org#
+    │   ├── images
+    │   │   ├── humidity.png
+    │   │   ├── temperature&pressure.png
+    │   │   └── temperature.png
+    │   ├── index.org
+    │   └── index.org~
+    └── public
+        ├── images
+        │   ├── humidity.png
+        │   ├── temperature&pressure.png
+        │   └── temperature.png
+        └── index.html
+
+6 directories, 20 files
+#+end_example
+
+Puede usar Emacs para la creación de la estructura de su proyecto
+usando comandos desde el bloque de shell. Recuerde ejecutar el bloque
+con ~C-c C-c~. Para insertar un bloque nuevo utilice ~C-c C-,~ o ~M-x
+org-insert-structure-template~. Seleccione la opción /s/ para src y
+adapte el bloque según su código tenga un comandos de shell, código de
+Python o de Java. En este documento ~.org~ dispone de varios ejemplos
+funcionales para escribir y presentar el código.
+
+#+begin_src shell :results output :exports both
+echo 'Aquí va sus comandos'
+#+end_src
+
+#+RESULTS:
+: Aquí va sus comandos
+
+** Formulación del Problema
+Se desea realizar un registro climatológico de una ciudad
+$\mathcal{C}$. Para esto, escriba un script de Python/Java que permita
+obtener datos climatológicos desde el API de [[https://openweathermap.org/current#one][openweathermap]]. El API
+hace uso de los valores de latitud $x$ y longitud $y$ de la ciudad
+$\mathcal{C}$ para devolver los valores actuales a un tiempo $t$.
+
+Los resultados obtenidos de la consulta al API se escriben en un
+archivo /clima-<ciudad>-hoy.csv/. Cada ejecución del script debe
+almacenar nuevos datos en el archivo. Utilice *crontab* y sus
+conocimientos de Linux y Programación para obtener datos del API de
+/openweathermap/ con una periodicidad de 15 minutos mediante la
+ejecución de un archivo ejecutable denominado
+/get-weather.sh/. Obtenga al menos 50 datos. Verifique los
+resultados. Todas las operaciones se realizan en Linux o en el
+WSL. Las etapas del problema se subdividen en:
+
+    1. Conformar los grupos de 2 estudiantes y definir la ciudad
+       objeto de estudio.
+    2.  Crear su API gratuito en [[https://openweathermap.org/current#one][openweathermap]]
+    3. Escribir un script en Python/Java que realice la consulta al
+       API y escriba los resultados en /clima-<ciudad>-hoy.csv/. El
+       archivo ha de contener toda la información que se obtiene del
+       API en columnas. Se debe observar que los datos sobre lluvia
+       (rain) y nieve (snow) se dan a veces si existe el fenómeno.
+    3. Desarrollar un ejecutable /get-weather.sh/ para ejecutar el
+       programa Python/Java.[fn:1]
+       #+begin_src shell :exports both
+         
+       #+end_src
+    4. Configurar Crontab para la adquisición de datos. Escriba el
+       comando configurado. Respalde la ejecución de crontab en un
+       archivo output.log
+    5. Realizar la presentación del Trabajo utilizando la generación
+       del sitio web por medio de Emacs. Para esto es necesario crear
+       la carpeta **weather-site** dentro del proyecto. Puede ajustar el
+       /look and feel/ según sus preferencias. El servidor a usar es
+       el **simple-httpd** integrado en Emacs que debe ser instalado:
+       - Usando comandos Emacs: ~M-x package-install~ presionamos
+         enter (i.e. RET) y escribimos el nombre del paquete:
+         simple-httpd
+       - Configurando el archivo init.el
+
+       #+begin_src elisp
+         (use-package simple-httpd
+            :ensure t)
+       #+end_src
+
+       Instrucciones de sobre la creación del sitio web se tiene en el
+       vídeo de instrucciones y en el archivo [[https://github.com/LeninGF/EPN-Lectures/blob/main/iccd332ArqComp-2024-A/Tutoriales/Org-Website/Org-Website.org][Org-Website.org]] en el
+       GitHub del curso
+
+    6. Su código debe estar respaldado en GitHub/BitBucket, la
+       dirección será remitida en la contestación de la tarea
+** Descripción del código
+En esta sección se debe detallar segmentos importantes del código
+desarrollado así como la **estrategia de solución** adoptada por el
+grupo para resolver el problema. Divida su código en unidades
+funcionales para facilitar su presentación y exposición.
+
+Lectura del API
+#+begin_src python :session :results output exports both
+def get_weather(lat, lon, api):
+    url = f'http://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api}&units=metric'
+    response = requests.get(url)
+    return response.json()
+#+end_src
+
+Puede tener que borrar los dos puntos para que el resultado aparezca
+en el HTML. En mi caso no fue necesario. Pruebe.
+#+RESULTS:
+ 
+
+Convertir /Json/ a /Diccionario/ de Python
+#+begin_src python :session :results output exports both
+  response = requests.get(url)
+  return response.json()
+#+end_src
+
+#+RESULTS:
+ 
+
+
+Guardar el archivo csv
+#+begin_src python :session :results output exports both
+def write2csv(data, filename='clima-london-hoy.csv'):
+    fieldnames = data.keys()
+
+    with open(filename, mode='a', newline='') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        if csvfile.tell() == 0:
+            writer.writeheader()
+        writer.writerow(data)
+#+end_src
+
+#+RESULTS:
+
+
+** Script ejecutable sh
+Se coloca el contenido del script ejecutable. Recuerde que se debe
+utilizar el entorno de **anaconda/mamba** denominado **iccd332** para
+la ejecución de Python; independientemente de que tenga una
+instalación nativa de Python
+
+En el caso de los shell script se puede usar `which sh` para conocer
+la ubicación del ejecutable
+#+begin_src shell :results output :exports both
+which sh
+#+end_src
+
+#+RESULTS:
+: /usr/bin/sh
+
+De igual manera se requiere localizar el entorno de mamba *iccd332*
+que será utilizado
+
+#+begin_src shell :results output :exports both
+which mamba
+#+end_src
+
+#+RESULTS:
+: /home/hodalys/miniforge3/condabin/mamba
+
+Con esto el archivo ejecutable a de tener (adapte el código según las
+condiciones de su máquina):
+
+#+begin_src shell :results output :exports both
+#!/usr/bin/sh
+source /home/hodalys/miniforge3/etc/profile.d/conda.sh
+eval "$(conda shell.bash hook)"
+conda activate iccd332
+python main.py
+#+end_src
+
+Finalmente convierta en ejecutable como se explicó en clases y laboratorio
+#+begin_src shell :results output :exports both
+  #!/usr/bin/sh
+  source /home/hodalys/miniforge3/etc/profile.d/conda.sh
+  eval "$(conda shell.bash hook)"
+  conda activate iccd332
+  python3 main.py
+#+end_src
+
+** Configuración de Crontab
+Se indica la configuración realizada en crontab para la adquisición de datos
+
+#+begin_src shell
+*/15 * * * * cd LondonWeather/ && ./get-weather.sh >> output.log 2>&1
+#+end_src
+
+#+RESULTS:
+
+- Recuerde remplazar <City> por el nombre de la ciudad que analice
+- Recuerde ajustar el tiempo para potenciar tomar datos nuevos
+- Recuerde que ~2>&1~ permite guardar en ~output.log~ tanto la salida
+  del programa como los errores en la ejecución.
+* Presentación de resultados
+Para la pressentación de resultados se utilizan las librerías de Python:
+- matplotlib
+- pandas
+
+Alternativamente como pudo estudiar en el Jupyter Notebook
+[[https://github.com/LeninGF/EPN-Lectures/blob/main/iccd332ArqComp-2024-A/Proyectos/CityWeather/CityTemperatureAnalysis.ipynb][CityTemperatureAnalysis.ipynb]], existen librerías alternativas que se
+pueden utilizar para presentar los resultados gráficos. En ambos
+casos, para que funcione los siguientes bloques de código, es
+necesario que realice la instalación de los paquetes usando ~mamba
+install <nombre-paquete>~
+** Muestra Aleatoria de datos
+:LOGBOOK:
+CLOCK: [2024-08-13 Tue 19:06]--[2024-08-13 Tue 21:33] =>  2:27
+:END:
+Presentar una muestra de 10 valores aleatorios de los datos obtenidos.
+#+caption: Lectura de archivo csv
+#+begin_src python :session :results output exports both
+import os
+import pandas as pd
+# lectura del archivo csv obtenido
+df = pd.read_csv('/home/hodalys/LondonWeather/clima-london-hoy-etl.csv')
+# se imprime la estructura del dataframe en forma de filas x columnas
+print(df.shape)
+#+end_src
+
+Resultado del número de filas y columnas leídos del archivo csv
+#+RESULTS:
+
+#+caption: Despliegue de datos aleatorios
+#+begin_src python :session :exports both :results value table :return table
+  table1 = df.sample(10)
+  table = [list(table1)]+[None]+table1.values.tolist()
+  table
+#+end_src
+
+#+RESULTS:
+| timestamp           | latitude | longitude | weather_id | weather_main | weather_description | weather_icon | base     |  temp | feels_like | temp_min | temp_max | pressure | humidity | sea_level | grnd_level | visibility | wind_speed | wind_deg | wind_gust | clouds_all |         dt | sys_type |  sys_id | country |    sunrise |     sunset | timezone | city_id | city_name | cod |
+|---------------------+----------+-----------+------------+--------------+---------------------+--------------+----------+-------+------------+----------+----------+----------+----------+-----------+------------+------------+------------+----------+-----------+------------+------------+----------+---------+---------+------------+------------+----------+---------+-----------+-----|
+| 2024-08-12 20:29:40 |  515.072 |   -0.1275 |        800 | Clear        | clear sky           | 01n          | stations | 17.81 |      17.55 |    16.12 |    18.40 |     1010 |       73 |      1010 |       1005 |      10000 |       0.89 |      245 | 1.34      |          9 | 1723515233 |        2 | 2075535 | GB      | 1723524207 | 1723577243 |     3600 | 2643743 | London    | 200 |
+| 2024-08-12 19:34:40 |  515.074 |   -0.1278 |        800 | Clear        | clear sky           | 01n          | stations | 19.21 |      18.94 |    17.79 |    19.92 |     1009 |       67 |      1009 |       1005 |      10000 |       3.09 |      240 | NA        |          5 | 1723509224 |        2 | 2075535 | GB      | 1723524207 | 1723577243 |     3600 | 2643743 | London    | 200 |
+| 2024-08-12 18:34:40 |  515.074 |   -0.1278 |        800 | Clear        | clear sky           | 01n          | stations | 20.40 |      20.17 |    18.09 |    21.27 |     1009 |       64 |      1009 |       1005 |      10000 |       0.45 |      261 | 2.68      |          4 | 1723504959 |        2 | 2075535 | GB      | 1723524207 | 1723577243 |     3600 | 2643743 | London    | 200 |
+| 2024-08-13 14:26:01 |  515.074 |   -0.1278 |        801 | Clouds       | few clouds          | 02n          | stations | 20.41 |      20.31 |    18.95 |    21.21 |     1010 |       69 |      1010 |       1006 |      10000 |       4.12 |      220 | NA        |         19 | 1723583398 |        2 | 2075535 | GB      | 1723524207 | 1723577243 |     3600 | 2643743 | London    | 200 |
+| 2024-08-13 17:42:02 |  515.084 |   -0.1254 |        803 | Clouds       | broken clouds       | 04n          | stations | 19.52 |      19.46 |    17.81 |    20.30 |     1011 |       74 |      1011 |       1007 |      10000 |       3.09 |      240 | NA        |         51 | 1723588474 |        2 | 2075535 | GB      | 1723524206 | 1723577243 |     3600 | 2643743 | London    | 200 |
+| 2024-08-13 18:29:01 |  515.073 |   -0.1277 |        803 | Clouds       | broken clouds       | 04n          | stations | 19.40 |      19.33 |    18.34 |    20.10 |     1011 |       74 |      1011 |       1007 |      10000 |       3.60 |      230 | NA        |         51 | 1723591157 |        2 | 2075535 | GB      | 1723610703 | 1723663527 |     3600 | 2643743 | London    | 200 |
+| 2024-08-12 17:29:03 |  515.074 |   -0.1278 |        800 | Clear        | clear sky           | 01n          | stations | 22.35 |      22.13 |    20.61 |    23.45 |     1009 |       57 |      1009 |       1005 |      10000 |       0.89 |      288 | 3.13      |          5 | 1723501610 |        2 |  268730 | GB      | 1723437712 | 1723490959 |     3600 | 2643743 | London    | 200 |
+| 2024-08-12 19:44:40 |  515.074 |   -0.1278 |        800 | Clear        | clear sky           | 01n          | stations | 19.20 |      18.90 |    17.79 |    19.92 |     1009 |       66 |      1009 |       1005 |      10000 |       3.09 |      240 | NA        |          5 | 1723509782 |        2 | 2075535 | GB      | 1723524207 | 1723577243 |     3600 | 2643743 | London    | 200 |
+| 2024-08-13 18:27:02 |  515.073 |   -0.1277 |        803 | Clouds       | broken clouds       | 04n          | stations | 19.40 |      19.33 |    18.34 |    20.10 |     1011 |       74 |      1011 |       1007 |      10000 |       3.60 |      230 | NA        |         51 | 1723591157 |        2 | 2075535 | GB      | 1723610703 | 1723663527 |     3600 | 2643743 | London    | 200 |
+| 2024-08-13 17:51:01 |  515.074 |   -0.1278 |        803 | Clouds       | broken clouds       | 04n          | stations | 19.31 |      19.23 |    17.83 |    20.10 |     1011 |       74 |      1011 |       1007 |      10000 |       3.09 |      240 | NA        |         51 | 1723588910 |        2 | 2075535 | GB      | 1723524207 | 1723577243 |     3600 | 2643743 | London    | 200 |
+
+** Gráfica Temperatura vs Tiempo
+Realizar una gráfica de la Temperatura en el tiempo.
+
+
+El siguiente cógido permite hacer la gráfica de la temperatura vs
+tiempo para Org 9.7+. Para saber que versión dispone puede ejecutar
+~M-x org-version~
+
+#+begin_src python :results file :exports both :session
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+# Define el tamaño de la figura de salida
+fig = plt.figure(figsize=(8,6))
+plt.plot(df['dt'], df['temp']) # dibuja las variables dt y temperatura
+# ajuste para presentacion de fechas en la imagen 
+plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=2))
+# plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))  
+plt.grid()
+# Titulo que obtiene el nombre de la ciudad del DataFrame
+plt.title(f 'Temp vs Time in {next(iter(set(df.name)))}')
+plt.xticks(rotation=40) # rotación de las etiquetas 40°
+fig.tight_layout()
+fname = '/home/hodalys/LondonWeather/weather-site/content/images/temperature.png'
+plt.savefig(fname)
+fname
+#+end_src
+
+#+caption: Gráfica Temperatura vs Tiempo
+#+RESULTS:
+[[file:/home/hodalys/LondonWeather/weather-site/content/images/temperature.png]]
+
+Debido a que el archivo index.org se abre dentro de la carpeta
+/content/, y en cambio el servidor http de emacs se ejecuta desde la
+carpeta /public/ es necesario copiar el archivo a la ubicación
+equivalente en ~/public/images~
+
+#+begin_src shell
+cp -rfv ./images/* /home/hodalys/LondonWeather/weather-site/public/images
+#+end_src
+
+#+RESULTS:
+| './images/humidity.png'             | -> | '/home/hodalys/LondonWeather/weather-site/public/images/humidity.png'             |
+| './images/temperature&pressure.png' | -> | '/home/hodalys/LondonWeather/weather-site/public/images/temperature&pressure.png' |
+| './images/temperature.png'          | -> | '/home/hodalys/LondonWeather/weather-site/public/images/temperature.png'          |
+
+**  Realice una gráfica de Humedad con respecto al tiempo
+
+#+begin_src python :results file :exports both :session
+  import matplotlib.pyplot as plt
+  import matplotlib.dates as mdates
+  fig = plt.figure(figsize=(6,4))
+  plt.plot(df_etl['dt'], df_etl['humidity'])
+  plt.grid()
+  plt.title(f'Humidity vs Time in {next(iter(set(df_etl.city_name)))}')
+  fig.tight_layout()
+  fname = '/home/hodalys/LondonWeather/weather-site/content/images/humidity.png'
+  plt.savefig(fname)
+  fname
+#+end_src
+
+#+caption: Gráfica Humedad vs Tiempo
+#+RESULTS:
+[[file:/home/hodalys/LondonWeather/weather-site/content/images/humidity.png]]
+
+**  *Opcional* Presente alguna gráfica de interés.
+#+caption: Gráfica Temperatura y Presión  vs Tiempo
+#+RESULTS:
+[[file:/home/hodalys/LondonWeather/weather-site/content/images/temperature&pressure.png]]
+
+
+* Referencias
+- [[https://emacs.stackexchange.com/questions/28715/get-pandas-data-frame-as-a-table-in-org-babel][presentar dataframe como tabla en emacs org]]
+- [[https://orgmode.org/worg/org-contrib/babel/languages/ob-doc-python.html][Python Source Code Blocks in Org Mode]]
+- [[https://systemcrafters.net/publishing-websites-with-org-mode/building-the-site/][Systems Crafters Construir tu sitio web con Modo Emacs Org]]
+- [[https://www.youtube.com/watch?v=AfkrzFodoNw][Vídeo Youtube Build Your Website with Org Mode]]
+* Footnotes
+
+[fn:1] Recuerde que su máquina ha de disponer de un entorno de
+anaconda/mamba denominado iccd332 en el cual se dispone del interprete
+de Python
